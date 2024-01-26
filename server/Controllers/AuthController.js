@@ -26,10 +26,10 @@ module.exports = {
         validationErrorResponse( res, `${result.value.email} is already been registered`);
       }
 
-      let hashPassword =await bcrypt.hash(result.value.password, 10) ;
+      // let hashPassword =await bcrypt.hash(result.value.password, 10) ;
+      // const user = new User({...result.value , password : 'hashPassword'});
+      const user = new User({...result.value });
 
-      const user = new User({...result.value , password : hashPassword});
-      
       const savedUser = await user.save();
 
       const accessToken = await signAccessToken(savedUser.id);

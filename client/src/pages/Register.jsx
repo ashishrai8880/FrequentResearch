@@ -1,22 +1,42 @@
 import React, { useState } from "react";
 import { TEInput, TERipple } from "tw-elements-react";
 import axios from 'axios' ;
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const Register = () => {
 
     const [user, setUser] = useState({
         first_name : undefined ,
         last_name : undefined ,
+        email : undefined ,
+        country : undefined ,
+        state : undefined ,
+        city : undefined ,
+        gender : undefined ,
+        date_of_birth : undefined ,
+        age : undefined ,
+        password : undefined ,
     }) ;
 
     const onChange = (e)=>{
-        console.log('on change : ',e.target.value);
-        const { name, value } = e.target;
 
-        setUser(prevUser => ({
+        if (e instanceof Date) {
+          // It's the date picker
+          setUser((prevUser) => ({
             ...prevUser,
-            [name]: value,
-        }));
+            date_of_birth: e,
+            age: calculateAge(e),
+          }));
+        } 
+        else{
+          const { name, value } = e.target;
+          setUser(prevUser => ({
+              ...prevUser,
+              [name]: value,
+          }));
+        }
+        
 
         console.log('new user : ',user)
     }
@@ -24,11 +44,42 @@ const Register = () => {
     const onSubmit = async (e)=>{
       e.preventDefault();
 
-      let res = await axios.post('http://localhost:3000/api/auth/register' , user) ;
+      // let res = await axios.post('http://localhost:3001/api/auth/register' , user) ;
 
-      console.log('after hitting api : ',res);
+      axios.post('http://localhost:3001/api/auth/register' , user).then((res)=>{
+
+      alert('You have successfully registered')
+
+      })
+      .catch((error)=>{
+        alert(`Error : ${error.response.data.message}`)
+        console.log('Error : ',error.response.data.message)
+      })
+
+      // if(res.status == 200 || res.status == 201){
+        
+      // }else{
+      //   alert('Error : ',res.data.message)
+      // }
+      setUser({});
+      // console.log('after hitting api : ',res);
 
     }
+
+    const calculateAge = (dob) => {
+      if (!dob) return undefined;
+  
+      const today = new Date();
+      const birthDate = new Date(dob);
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+  
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+  
+      return age;
+    };
 
   return (
     <>
@@ -75,42 +126,86 @@ const Register = () => {
                         ></TEInput>
                         
                         <TEInput
+                          onChange={onChange}
+                          name="email"
+                          value={user.email  || ''}
                           type="text"
                           label="Email"
                           className="mb-4"
                         ></TEInput>
                         
                         <TEInput
+                          onChange={onChange}
+                          name="country"
+                          value={user.country  || ''}
                           type="text"
                           label="Country"
                           className="mb-4"
                         ></TEInput>
                         
                         <TEInput
+                          onChange={onChange}
+                          name="state"
+                          value={user.state  || ''}
                           type="text"
                           label="State"
                           className="mb-4"
                         ></TEInput>
                         
                         <TEInput
+                          onChange={onChange}
+                          name="city"
+                          value={user.city  || ''}
                           type="text"
                           label="City"
-                          className="mb-4"
-                        ></TEInput>
-                        
+                          className="mb-4 w-full p-2 border rounded focus:outline-none focus:border-blue-500"
+                        ></TEInput>                        
+
+                        <div className="flex items-center mb-4">
+                          <label className="mr-4">Gender:</label>
+                          <div className="flex items-center">
+                            <input
+                              type="radio"
+                              id="male"
+                              name="gender"
+                              value='male'
+                              checked={user.gender == 'male'}
+                              onChange={onChange}
+                              className="mr-2"
+                            />
+                            <label htmlFor="male" className="mr-4">
+                              Male
+                            </label>
+
+                            <input
+                              type="radio"
+                              id="female"
+                              name="gender"
+                              value='female'
+                              checked={user.gender == 'female'}
+                              onChange={onChange}
+                              className="mr-2"
+                            />
+                            <label htmlFor="female">Female</label>
+                          </div>
+                        </div>
+
+                        <div>
+                          <label>Date of Birth : </label>
+                          <DatePicker
+                            name="date_of_birth"
+                            selected={user.date_of_birth}
+                            onChange={onChange}
+                            showYearDropdown
+                            dateFormat="yyyy-MM-dd"
+                            className="mb-4"
+                          />
+                        </div>  
+                                                
                         <TEInput
-                          type="text"
-                          label="Gender"
-                          className="mb-4"
-                        ></TEInput>
-                        
-                        <TEInput
-                          type="text"
-                          label="Date of Birth"
-                          className="mb-4"
-                        ></TEInput>
-                        
-                        <TEInput
+                          onChange={onChange}
+                          name="age"
+                          value={user.age !== undefined ? user.age : ''}
                           type="text"
                           label="Age"
                           className="mb-4"
@@ -118,6 +213,9 @@ const Register = () => {
 
                         
                         <TEInput
+                          onChange={onChange}
+                          name="password"
+                          value={user.password  || ''}
                           type="password"
                           label="Password"
                           className="mb-4"

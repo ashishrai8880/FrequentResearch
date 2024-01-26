@@ -16,37 +16,37 @@ const UserSchema = new Schema({
     lowercase: true,
     unique: true,
   },
-  country: {
-    type: String,
-  },
-  state: {
-    type: String,
-  },
-  city: {
-    type: String,
-  },
-  gender: {
-    type: String,
-  },
-  date_of_birth : {
-    type : String ,
-  },
-  age : {
-    type : String ,
-  },
-  password : {
-    type : String ,
-  },
+  // country: {
+  //   type: String,
+  // },
+  // state: {
+  //   type: String,
+  // },
+  // city: {
+  //   type: String,
+  // },
+  // gender: {
+  //   type: String,
+  // },
+  // date_of_birth : {
+  //   type : String ,
+  // },
+  // age : {
+  //   type : String ,
+  // },
+  // password : {
+  //   type : String ,
+  // },
   
 })
 
-UserSchema.methods.isValidPassword = async function (password) {
-  try {
-    return await bcrypt.compare(password, this.password)
-  } catch (error) {
-    throw error
-  }
-}
+// UserSchema.methods.isValidPassword = async function (password) {
+//   try {
+//     return await bcrypt.compare(password, this.password)
+//   } catch (error) {
+//     throw error
+//   }
+// }
 
 const User = mongoose.model('user', UserSchema)
 module.exports = User
