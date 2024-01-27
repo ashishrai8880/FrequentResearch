@@ -47,6 +47,13 @@ const userNotExists = (res) => {
   });
 };
 
+const userResponse = (res , data) => {
+  res.status(200).json({
+    message: "User Fetched Successfully",
+    data : data
+  });
+};
+
 const invalidCredentials = (res) => {
   res.status(404).json({
     message: "Credentials are not valid . Please Enter correct credentials",
@@ -62,5 +69,6 @@ module.exports = {
   invalidCredentials,
   countryList ,
   state_by_country ,
-  city_by_state 
+  city_by_state ,
+  userResponse 
 };

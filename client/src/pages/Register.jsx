@@ -5,8 +5,11 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from 'react-router-dom';
 
 const Register = () => {
+
+  const navigate = useNavigate();
 
     const [user, setUser] = useState({
         first_name : undefined ,
@@ -91,6 +94,10 @@ const Register = () => {
           theme: "light",
           });
 
+          setTimeout(() => {
+            navigate('/');
+          }, 2000);
+
       })
       .catch((error)=>{
         toast.error(`Error : ${error.response.data.message}`, {
@@ -104,6 +111,7 @@ const Register = () => {
           theme: "light",
           });
         console.log('Error : ',error.response.data.message)
+        
       })
 
       
