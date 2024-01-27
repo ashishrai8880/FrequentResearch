@@ -9,6 +9,7 @@ const { verifyAccessToken } = require("./helpers/jwt_helper");
 const PORT = process.env.PORT || 3000;
 
 const AuthRoute = require("./Routes/AuthRoute");
+const AddressRoute = require("./Routes/AddressRoute");
 
 const startServer = () => {
   const app = express();
@@ -22,6 +23,7 @@ const startServer = () => {
   });
 
   app.use("/api/auth", AuthRoute);
+  app.use("/api/auth", AddressRoute);
 
 //   app.use(async (req, res, next) => {
 //     next(createError.NotFound());
