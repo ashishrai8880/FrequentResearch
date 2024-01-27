@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { TEInput, TERipple } from "tw-elements-react";
 import axios from 'axios' ;
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Register = () => {
 
@@ -19,6 +21,10 @@ const Register = () => {
         password : undefined ,
     }) ;
 
+    const [country, setCountry] = useState([]) ;
+    const [state, setState] = useState([]) ;
+    const [city, setCity] = useState([]) ;
+
     const onChange = (e)=>{
 
         if (e instanceof Date) {
@@ -29,6 +35,33 @@ const Register = () => {
             age: calculateAge(e),
           }));
         } 
+        else if(e.target.name == 'country'){
+          let { name, value } = e.target;
+          value = JSON.parse(value)
+          handleCountryChange(value);
+          setUser(prevUser => ({
+              ...prevUser,
+              [name]: value.title,
+          }));
+        }
+        else if(e.target.name == 'state'){
+          let { name, value } = e.target;
+          value = JSON.parse(value)
+          handleStateChange(value);
+          setUser(prevUser => ({
+              ...prevUser,
+              [name]: value.title,
+          }));
+        }
+        else if(e.target.name == 'city'){
+          let { name, value } = e.target;
+          value = JSON.parse(value)
+          console.log('city : ',value)
+          setUser(prevUser => ({
+              ...prevUser,
+              [name]: value.title,
+          }));
+        }
         else{
           const { name, value } = e.target;
           setUser(prevUser => ({
@@ -47,22 +80,34 @@ const Register = () => {
       // let res = await axios.post('http://localhost:3001/api/auth/register' , user) ;
 
       axios.post('http://localhost:3001/api/auth/register' , user).then((res)=>{
-
-      alert('You have successfully registered')
+        toast.success('You have successfully registered !', {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
 
       })
       .catch((error)=>{
-        alert(`Error : ${error.response.data.message}`)
+        toast.error(`Error : ${error.response.data.message}`, {
+          position: "top-center",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          });
         console.log('Error : ',error.response.data.message)
       })
 
-      // if(res.status == 200 || res.status == 201){
-        
-      // }else{
-      //   alert('Error : ',res.data.message)
-      // }
-      setUser({});
-      // console.log('after hitting api : ',res);
+      
+      // setUser({});
 
     }
 
@@ -81,8 +126,43 @@ const Register = () => {
       return age;
     };
 
+    const getCountryList =async ()=>{
+      let data = await axios.get('http://localhost:3001/api/auth/country/list') ;
+      setCountry(data.data.data)
+      // console.log('counotry list : ',data.data.data) ;
+    }
+
+    const handleCountryChange =async (value)=>{
+      let data = await axios.get(`http://localhost:3001/api/auth/state/state_by_country?country_id=${value.id}`) ;
+      setState(data.data.data)
+    }
+
+    const handleStateChange =async (value)=>{
+      let data = await axios.get(`http://localhost:3001/api/auth/city/city_by_state?state_id=${value.state_id}`) ;
+      setCity(data.data.data)
+    }
+
+    useEffect(() => {
+      getCountryList();
+    }, [])
+
+
+    
+
   return (
     <>
+      <ToastContainer
+      position="top-center"
+      autoClose={5000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+      theme="light"
+      />
       <section className="h-full bg-neutral-200 dark:bg-neutral-700">
         <div className="container h-full p-10">
           <div className="g-6 flex h-full flex-wrap items-center justify-center text-neutral-800 dark:text-neutral-200">
@@ -134,32 +214,39 @@ const Register = () => {
                           className="mb-4"
                         ></TEInput>
                         
-                        <TEInput
-                          onChange={onChange}
-                          name="country"
-                          value={user.country  || ''}
-                          type="text"
-                          label="Country"
-                          className="mb-4"
-                        ></TEInput>
+
+                        <div className="relative mb-4">
+                          <label htmlFor="country" className="block text-sm font-medium text-gray-700">Country</label>
+                          <select id="country" name="country" onChange={onChange} className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                            <option value="" disabled selected>Select Country</option>
+                            {country.map(ele => (
+                             <option key={ele.id} value={JSON.stringify(ele)}>{ele.title}</option>
+                            ))}
+                          </select>
+                        </div>
                         
-                        <TEInput
-                          onChange={onChange}
-                          name="state"
-                          value={user.state  || ''}
-                          type="text"
-                          label="State"
-                          className="mb-4"
-                        ></TEInput>
+
+                        <div className="relative mb-4">
+                          <label htmlFor="state" className="block text-sm font-medium text-gray-700">State</label>
+                          <select id="state" name="state" onChange={onChange} className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                            <option value="" disabled selected>Select State</option>
+                            {state.map(state => (
+                             <option key={state.id} value={JSON.stringify(state)}>{state.title}</option>
+                            ))}
+                          </select>
+                        </div>
                         
-                        <TEInput
-                          onChange={onChange}
-                          name="city"
-                          value={user.city  || ''}
-                          type="text"
-                          label="City"
-                          className="mb-4 w-full p-2 border rounded focus:outline-none focus:border-blue-500"
-                        ></TEInput>                        
+
+                        <div className="relative mb-4">
+                          <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
+                          <select id="city" name="city" onChange={onChange} className="mt-1 p-2 block w-full border border-gray-300 rounded-md focus:outline-none focus:ring focus:border-blue-300">
+                            <option value="" disabled selected>Select City</option>
+                            {city.map(ele => (
+                             <option key={ele.id} value={JSON.stringify(ele)}>{ele.title}</option>
+                            ))}
+                          </select>
+                        </div>
+                                          
 
                         <div className="flex items-center mb-4">
                           <label className="mr-4">Gender:</label>
